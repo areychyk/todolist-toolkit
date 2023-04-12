@@ -2,9 +2,8 @@ import React, { useCallback, useEffect } from 'react'
 import './App.css'
 import { TodolistsList } from 'features/TodolistsList/TodolistsList'
 import { ErrorSnackbar } from 'components/ErrorSnackbar/ErrorSnackbar'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppRootStateType } from './store'
-import { initializeAppTC, RequestStatusType } from 'app/app.reducer'
+import { useSelector } from 'react-redux'
+import { initializeAppTC } from 'app/app.reducer'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Login } from 'features/auth/Login'
 import { logoutTC } from 'features/auth/auth.reducer'
@@ -19,28 +18,27 @@ import {
 	Typography
 } from '@mui/material';
 import { Menu } from '@mui/icons-material'
-import {useAppDispatch} from "hooks/useAppDispatch";
-import {selectIsLoggedIn} from "features/auth/auth.selectors";
-import {selectIsInitialized, selectStatus} from "app/app.selectors";
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import { selectIsLoggedIn } from 'features/auth/auth.selectors';
+import { selectAppStatus, selectIsInitialized } from 'app/app.selectors';
 
 type PropsType = {
 	demo?: boolean
 }
 
 function App({demo = false}: PropsType) {
-
-	const status = useSelector(selectStatus)
+	const status = useSelector(selectAppStatus)
 	const isInitialized = useSelector(selectIsInitialized)
 	const isLoggedIn = useSelector(selectIsLoggedIn)
+
 	const dispatch = useAppDispatch()
-
-	const logoutHandler = useCallback(() => {
-		dispatch(logoutTC())
-	}, [])
-
 
 	useEffect(() => {
 		dispatch(initializeAppTC())
+	}, [])
+
+	const logoutHandler = useCallback(() => {
+		dispatch(logoutTC())
 	}, [])
 
 	if (!isInitialized) {
