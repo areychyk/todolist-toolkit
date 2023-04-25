@@ -1,47 +1,40 @@
-import React, {ChangeEvent, FC, memo} from 'react'
-import {Checkbox, IconButton} from '@mui/material'
-import {Delete} from '@mui/icons-material'
-import {EditableSpan} from 'common/components'
-import {TaskStatuses} from 'common/enums';
-import {TaskType} from "features/todolists-list/tasks/tasks.api";
-import {useActions} from "common/hooks";
-import {tasksThunks} from "features/todolists-list/tasks/tasks.reducer";
-import s from 'features/todolists-list/todolists/Todolist/Tasks/Task/styles.module.css'
-
+import React, { ChangeEvent, FC, memo } from "react";
+import { Checkbox, IconButton } from "@mui/material";
+import { Delete } from "@mui/icons-material";
+import { EditableSpan } from "common/components";
+import { TaskStatuses } from "common/enums";
+import { TaskType } from "features/todolists-list/tasks/tasks.api";
+import { useActions } from "common/hooks";
+import { tasksThunks } from "features/todolists-list/tasks/tasks.reducer";
+import s from "features/todolists-list/todolists/Todolist/Tasks/Task/styles.module.css";
 
 type Props = {
-    task: TaskType
-    todolistId: string
+  task: TaskType;
+  todolistId: string;
+};
 
-}
+export const Task: FC<Props> = memo(({ task, todolistId }) => {
+  const { removeTask, updateTask } = useActions(tasksThunks);
 
-export const Task: FC<Props> = memo(({task, todolistId}) => {
+  const removeTaskHandler = () => removeTask({ taskId: task.id, todolistId });
 
-    const {removeTask, updateTask} = useActions(tasksThunks)
+  const changeStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const status = e.currentTarget.checked ? TaskStatuses.Completed : TaskStatuses.New;
+    updateTask({ taskId: task.id, domainModel: { status }, todolistId });
+  };
 
-    const removeTaskHandler = () => removeTask({taskId: task.id, todolistId})
+  const changeTitleHandler = (title: string) => {
+    updateTask({ taskId: task.id, domainModel: { title }, todolistId });
+  };
 
-    const changeStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        let status = e.currentTarget.checked ? TaskStatuses.Completed : TaskStatuses.New
-        updateTask({taskId: task.id, domainModel: {status}, todolistId})
-    }
+  return (
+    <div key={task.id} className={task.status === TaskStatuses.Completed ? s.isDone : ""}>
+      <Checkbox checked={task.status === TaskStatuses.Completed} color="primary" onChange={changeStatusHandler} />
 
-    const changeTitleHandler = (title: string) => {
-        updateTask({taskId: task.id, domainModel: {title}, todolistId})
-    }
-
-    return (
-        <div key={task.id} className={task.status === TaskStatuses.Completed ? s.isDone : ''}>
-            <Checkbox
-                checked={task.status === TaskStatuses.Completed}
-                color="primary"
-                onChange={changeStatusHandler}
-            />
-
-            <EditableSpan value={task.title} onChange={changeTitleHandler}/>
-            <IconButton onClick={removeTaskHandler}>
-                <Delete/>
-            </IconButton>
-        </div>
-    )
-})
+      <EditableSpan value={task.title} onChange={changeTitleHandler} />
+      <IconButton onClick={removeTaskHandler}>
+        <Delete />
+      </IconButton>
+    </div>
+  );
+});
