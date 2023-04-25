@@ -1,33 +1,25 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {RequestStatusType} from 'app/app.reducer'
-import {todolistsApi, TodolistType, UpdateTodolistTitleArgType} from 'features/TodolistsList/todolists.api';
+import {todolistsApi, TodolistType, UpdateTodolistTitleArgType} from 'features/todolists-list/todolists/todolists.api';
 import {createAppAsyncThunk, handleServerAppError} from 'common/utils';
 import {ResultCode} from 'common/enums';
 import {clearTasksAndTodolists} from 'common/actions';
 import {thunkTryCatch} from "common/utils/thunk-try-catch";
 
 const fetchTodolists = createAppAsyncThunk<{ todolists: TodolistType[] }, void>
-('todo/fetchTodolists', async (_, thunkAPI) => {
-	const {dispatch, rejectWithValue} = thunkAPI
-	return thunkTryCatch(thunkAPI, async ()=>{
+('todo/fetchTodolists', async () => {
 		const res = await todolistsApi.getTodolists()
 		return {todolists: res.data}
-	})
-
 })
 
 const addTodolist = createAppAsyncThunk<{ todolist: TodolistType }, string>
-('todo/addTodolist', async (title, thunkAPI) => {
-	const {dispatch, rejectWithValue} = thunkAPI
-	return thunkTryCatch(thunkAPI, async ()=>{
+('todo/addTodolist', async (title, {rejectWithValue}) => {
 		const res = await todolistsApi.createTodolist(title)
 		if (res.data.resultCode === ResultCode.Success) {
 			return {todolist: res.data.data.item}
 		} else {
-			handleServerAppError(res.data, dispatch);
-			return rejectWithValue(null)
+			return rejectWithValue(res.data)
 		}
-	})
 })
 
 const removeTodolist = createAppAsyncThunk<{ id: string }, string>
