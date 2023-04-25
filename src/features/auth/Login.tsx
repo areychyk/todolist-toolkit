@@ -43,8 +43,6 @@ export const Login = () => {
                             formikHelpers.setFieldError(fieldError.field, fieldError.error)
                         })
                     }
-
-
                 })
         },
     })
